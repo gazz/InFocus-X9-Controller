@@ -1,0 +1,7 @@
+//
+// Prefix header for all source files of the 'InFocusController' target in the 'InFocusController' project
+//
+
+#ifdef __OBJC__
+    #import <Cocoa/Cocoa.h>
+#endif
