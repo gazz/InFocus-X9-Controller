@@ -14,6 +14,16 @@
 #define REQUEST_FAILED @"[FAL]"
 #define REQUEST_NA @"[NA]"
 
+//#define X9_PROTOCOL_DEBUG
+
+typedef enum {
+	kDisplayMode_PC = 0,
+	kDisplayMode_Movie,
+	kDisplayMode_sRGB,
+	kDisplayMode_Game,
+	kDisplayMode_User
+} DisplayMode;
+
 @interface ProjectorProtocol : NSObject {
 	NSString *devPath;
 	NSString *response;
@@ -48,6 +58,11 @@
 -(BOOL) showMenu;
 -(BOOL) setSource:(UInt32)source;
 -(UInt32) source;
+
+-(DisplayMode) displayMode;
+-(BOOL) setDisplayMode:(DisplayMode)value;
+-(BOOL) setBrightness:(UInt32)value;
+-(BOOL) setContrast:(UInt32)value;
 
 
 

@@ -18,6 +18,7 @@
 	IBOutlet NSMenuItem *quitItem;
 	IBOutlet NSMenuItem *sourceLock;
 	IBOutlet NSMenu *sources;
+	IBOutlet NSMenu *displayModes;
 	ProjectorProtocol *protocol;
 	NSLock *connectLock;
 	NSTimer *timer;
@@ -29,10 +30,11 @@
 @property (retain) NSMenuItem *quitItem;
 @property (retain) NSMenuItem *sourceLock;
 @property (retain) NSMenu *sources;
+@property (retain) NSMenu *displayModes;
 @property (retain) NSTimer *timer;
 
 -(void) connectToProjector;
--(void) toggleStatus;
+-(void) updateStatus;
 
 -(IBAction) quitApp:(id)sender;
 -(IBAction) switchSource:(id)sender;
@@ -43,6 +45,9 @@
 
 -(IBAction) preferences:(id)sender;
 
+-(IBAction) setPreset:(id)sender;
+
+-(IBAction) setDisplayMode:(id)sender;
 
 @property (assign) IBOutlet NSWindow *window;
 

@@ -11,15 +11,16 @@
 
 @implementation InFocusControllerAppDelegate
 
-@synthesize window, protocol, connectLock, powerItem, quitItem, timer, sourceLock, sources;
+@synthesize window, protocol, connectLock, powerItem, quitItem, timer, sourceLock, sources, displayModes;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
 	self.connectLock = [[NSLock alloc] init];
-	[self toggleStatus];
+	[self updateStatus];
+	powerItem.title = @"Connecting...";
 	// open connection in background thread 
 	[self performSelectorInBackground:@selector(connectToProjector) withObject:nil];
 	
-	self.timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(toggleStatus) userInfo:nil repeats:YES];
+	self.timer = [NSTimer scheduledTimerWithTimeInterval:3 target:self selector:@selector(updateStatus) userInfo:nil repeats:YES];
 }
 
 -(void) awakeFromNib {
@@ -42,14 +43,15 @@
 	[quitItem release];
 	[sourceLock release];
 	[sources release];
+	[displayModes release];
 	[protocol release];
 	[connectLock release];
 	[super dealloc];
 }
 
 -(void) connectToProjector {
-	[connectLock lock];
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+	[connectLock lock];
 	NSEnumerator *enumerator = [AMSerialPortList portEnumerator];
 	AMSerialPort *aPort;
 	while (aPort = [enumerator nextObject]) {
@@ -57,7 +59,7 @@
 		self.protocol = [ProjectorProtocol protocolWithDevPath:[aPort bsdPath]];
 		if ([protocol isOpen] && [protocol isProjectorConnected]) {
 			NSLog(@"Successfully connected to projector: %@", [aPort bsdPath]);
-			[self performSelectorOnMainThread:@selector(toggleStatus) withObject:nil waitUntilDone:NO];
+			[self performSelectorOnMainThread:@selector(updateStatus) withObject:nil waitUntilDone:NO];
 			break;
 		} else {
 			self.protocol = nil;
@@ -66,13 +68,15 @@
 	if (protocol==nil) {
 		NSLog(@"Cannot find projector");
 	}
-	[pool release];
 	[connectLock unlock];
+	[pool release];
 }
 
 
--(void) toggleStatus {
-	[connectLock lock];
+-(void) updateStatus {
+	if (![connectLock tryLock]) {
+		return;
+	}
 	BOOL enabled = NO, poweredOn = [protocol isProjectorOn];
 	if (protocol==nil ) {
 		// disable menus & show connecting icon
@@ -94,6 +98,7 @@
 		[img setSize:NSMakeSize(18, 18)];
 		[statusItem setImage:img];
 		poweredOn = [protocol isProjectorOn];
+		
 	}
 	for (int i=0; i< [statusMenu numberOfItems]; ++i) {
 		NSMenuItem *item = [statusMenu itemAtIndex:i];
@@ -114,11 +119,25 @@
 	UInt32 activeSource = [protocol source];
 	for (int i=0; i< [sources numberOfItems]; ++i) {
 		NSMenuItem *item = [sources itemAtIndex:i];
+		if ([item isEqualTo:sourceLock])
+			continue;
 		if ([item tag]==activeSource)
 			[item setState:NSOnState];
 		else
 			[item setState:NSOffState];
 	}	
+	
+	// current display mode
+	UInt32 activeDisplayMode = [protocol displayMode];
+	for (int i=0; i< [displayModes numberOfItems]; ++i) {
+		NSMenuItem *item = [displayModes itemAtIndex:i];
+		if ([item tag]==activeDisplayMode)
+			[item setState:NSOnState];
+		else
+			[item setState:NSOffState];
+	}	
+	
+	
 	[connectLock unlock];
 }
 
@@ -151,18 +170,47 @@
 	} else {
 		[protocol lockSource];
 	}
-	[self toggleStatus];
+	[self updateStatus];
 }
 
 -(IBAction) showMenu:(id)sender {
 	NSLog(@"Showing menu");
 	[protocol showMenu];
-	[self toggleStatus];
+	[self updateStatus];
 }
 
 -(IBAction) preferences:(id)sender {
 	NSLog(@"Preferences");
 }
+
+-(IBAction) setDisplayMode:(id)sender {
+	[protocol setDisplayMode:[sender tag]];
+}
+
+
+-(IBAction) setPreset:(id)sender {
+	switch ([sender tag]) {
+		case 1: {
+			NSLog(@"Setting Game preset");
+			// GAME
+			[protocol setDisplayMode:kDisplayMode_Game];
+			[protocol setBrightness:30];
+			[protocol setContrast:-10];
+			break;
+		}
+		case 2: {
+			NSLog(@"Setting PC preset");
+			// PC
+			[protocol setDisplayMode:kDisplayMode_PC];
+			[protocol setBrightness:0];
+			[protocol setContrast:-3];
+			break;
+		}
+		default:
+			break;
+	}
+}
+
 
 
 @end

@@ -13,9 +13,10 @@
 
 @interface ProjectorProtocol (PrivateMethods)
 -(void) serialPortReadData:(NSDictionary *)dataDictionary;
+-(UInt32) parseIntResponse:(NSString*)message;
+-(UInt32) sendReadValueMessage:(NSString*)message;
+-(BOOL) sendInputMessage:(NSString*)message withValue:(UInt32)value;
 @end
-
-
 
 @implementation ProjectorProtocol
 
@@ -34,7 +35,7 @@
 									 type:(NSString*)CFSTR(kIOSerialBSDModemType)];
 		[port setDelegate:self];
 		if ([port open]) {
-#ifdef AMSerialDebug
+#ifdef X9_PROTOCOL_DEBUG
 			NSLog(@"Port open");
 #endif
 			[port readDataInBackground];
@@ -72,7 +73,7 @@
 	[lock unlock];
 	
 	NSString *sendString = [data stringByAppendingString:@"\r"];
-#ifdef AMSerialDebug
+#ifdef X9_PROTOCOL_DEBUG
 	NSLog(@"Request: %@", sendString);
 #endif
 	[self performSelector:@selector(performSend:) withObject:sendString];
@@ -142,13 +143,13 @@
 		else {
 			self.response = [response stringByAppendingString:text];
 		}
-#ifdef AMSerialDebug
+#ifdef X9_PROTOCOL_DEBUG
 //		NSLog(@"Received data: %@, Response: '%@' [%d]", text, response, response.length);
 #endif
 		
 		// search for one of the 
 		if ([self extractMessages:response]) {
-#ifdef AMSerialDebug
+#ifdef X9_PROTOCOL_DEBUG
 			NSLog(@"Response: %@", response);
 #endif
 			[lock lock];
@@ -167,26 +168,6 @@
 	return [port isOpen];
 }
 
-
-#pragma mark -
-#pragma mark X9 Projector interface
-
--(BOOL)isProjectorConnected {
-	NSArray *messages = [self sendRequest:@"[00PWR?]"];
-	if ([[messages lastObject] isEqualToString:REQUEST_FAILED])
-		return YES;
-	return NO;
-}
-
--(BOOL)isProjectorOn {
-	NSArray *messages = [self sendRequest:@"[00SRC?]"];
-	if ([[messages lastObject] isEqualToString:REQUEST_PASSED])
-		return YES;
-	if ([self isSourceLocked])
-		return YES;
-	return NO;
-}
-
 -(UInt32) parseIntResponse:(NSString*)message {
 	// remove square brackets
 	NSString *str = [message stringByReplacingOccurrencesOfString:@"[" withString:@""];
@@ -195,77 +176,96 @@
 	return [str intValue];
 }
 
--(BOOL)isSourceLocked {
-	NSArray *messages = [self sendRequest:@"[00SRL?]"];
-	if ([[messages lastObject] isEqualToString:REQUEST_PASSED]) {
-		UInt32 result = [self parseIntResponse:[messages objectAtIndex:0]];
-		return result == 1;
-	}
-	return NO;
-}
-
--(BOOL) powerOn {
-	NSArray *messages = [self sendRequest:@"[00PWR1]"];
-	if (![[messages lastObject] isEqualToString:REQUEST_PASSED]) {
-		NSLog(@"Cannot power on projector");
-		return NO;
-	}
-	return YES;
-}
-
--(BOOL) powerOff {
-	NSArray *messages = [self sendRequest:@"[00PWR0]"];
-	if (![[messages lastObject] isEqualToString:REQUEST_PASSED]) {
-		NSLog(@"Cannot power off projector");
-		return NO;
-	}
-	return YES;
-}
-
--(BOOL) lockSource {
-	NSArray *messages = [self sendRequest:@"[00SRL1]"];
-	if (![[messages lastObject] isEqualToString:REQUEST_PASSED]) {
-		NSLog(@"Cannot lock source");
-		return NO;
-	}
-	return YES;
-}
-
--(BOOL) unlockSource {
-	NSArray *messages = [self sendRequest:@"[00SRL0]"];
-	if (![[messages lastObject] isEqualToString:REQUEST_PASSED]) {
-		NSLog(@"Cannot unlock source");
-		return NO;
-	}
-	return YES;
-}
-
--(BOOL) showMenu {
-	NSArray *messages = [self sendRequest:@"[00KEY1]"];
-	if (![[messages lastObject] isEqualToString:REQUEST_PASSED]) {
-		NSLog(@"Cannot power off projector");
-		return NO;
-	}
-	return YES;
-}
-
--(BOOL) setSource:(UInt32)source {
-	NSArray *messages = [self sendRequest:[NSString stringWithFormat:@"[00SRC%d]", source]];
-	if (![[messages lastObject] isEqualToString:REQUEST_PASSED]) {
-		NSLog(@"Cannot set source: %d", source);
-		return NO;
-	}
-	return YES;
-}
-
--(UInt32) source {
-	NSArray *messages = [self sendRequest:@"[00SRC?]"];
+-(UInt32) sendReadValueMessage:(NSString*)message {
+	NSString *encodedMessage = [NSString stringWithFormat:@"[00%@]", message];
+	NSArray *messages = [self sendRequest:encodedMessage];
 	if ([[messages lastObject] isEqualToString:REQUEST_PASSED]) {
 		UInt32 result = [self parseIntResponse:[messages objectAtIndex:0]];
 		return result;
+	} else {
+#ifdef X9_PROTOCOL_DEBUG
+		NSLog(@"Read value message %@ failed", encodedMessage);
+#endif
 	}
 	return -1;
 }
+
+-(BOOL) sendInputMessage:(NSString*)message withValue:(UInt32)value {
+	NSString *encodedMessage = [NSString stringWithFormat:@"[00%@%d]", message, value];
+	NSArray *messages = [self sendRequest:encodedMessage];
+	if (![[messages lastObject] isEqualToString:REQUEST_PASSED]) {
+#ifdef X9_PROTOCOL_DEBUG
+		NSLog(@"Send input message %@ failed", encodedMessage);
+#endif
+		return NO;
+	}
+	return YES;
+}
+
+#pragma mark -
+#pragma mark X9 Projector interface
+
+-(BOOL)isProjectorConnected {
+	return [self sendReadValueMessage:@"PWR?"];
+}
+
+-(BOOL)isProjectorOn {
+	if ([self sendReadValueMessage:@"SRC?"])
+		return YES;
+	if ([self isSourceLocked])
+		return YES;
+	return NO;
+}
+
+
+-(BOOL)isSourceLocked {
+	return (1==[self sendReadValueMessage:@"SRL?"]);
+}
+
+-(BOOL) powerOn {
+	return [self sendInputMessage:@"PWR" withValue:1];
+}
+
+-(BOOL) powerOff {
+	return [self sendInputMessage:@"PWR" withValue:0];
+}
+
+-(BOOL) lockSource {
+	return [self sendInputMessage:@"SRL" withValue:1];
+}
+
+-(BOOL) unlockSource {
+	return [self sendInputMessage:@"SRL" withValue:0];
+}
+
+-(BOOL) showMenu {
+	return [self sendInputMessage:@"KEY" withValue:1];
+}
+
+-(BOOL) setSource:(UInt32)source {
+	return [self sendInputMessage:@"SRC" withValue:source];
+}
+
+-(UInt32) source {
+	return [self sendReadValueMessage:@"SRC?"];
+}
+
+-(DisplayMode) displayMode {
+	return [self sendReadValueMessage:@"DSP?"];
+}
+
+-(BOOL) setDisplayMode:(DisplayMode)value {
+	return [self sendInputMessage:@"DSP" withValue:value];
+}
+
+-(BOOL) setBrightness:(UInt32)value {
+	return [self sendInputMessage:@"BRI" withValue:value];
+}
+
+-(BOOL) setContrast:(UInt32)value {
+	return [self sendInputMessage:@"CON" withValue:value];
+}
+
 
 
 @end
