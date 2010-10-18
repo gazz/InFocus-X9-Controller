@@ -15,6 +15,18 @@
 		EE749432125CC1A000775357 /* projektors.icns in Resources */ = {isa = PBXBuildFile; fileRef = EE749431125CC1A000775357 /* projektors.icns */; };
 		EE749471125CE1F600775357 /* 16_proj.png in Resources */ = {isa = PBXBuildFile; fileRef = EE749470125CE1F600775357 /* 16_proj.png */; };
 		EE7494FD125CE6F500775357 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE7494FC125CE6F500775357 /* IOKit.framework */; };
+		EE7A68411268D3EE003AC568 /* web.html in Resources */ = {isa = PBXBuildFile; fileRef = EE7A68401268D3EE003AC568 /* web.html */; };
+		EE7A687C1268D477003AC568 /* CDataScanner.m in Sources */ = {isa = PBXBuildFile; fileRef = EE7A68651268D477003AC568 /* CDataScanner.m */; };
+		EE7A687D1268D477003AC568 /* CDataScanner_Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = EE7A68681268D477003AC568 /* CDataScanner_Extensions.m */; };
+		EE7A687E1268D477003AC568 /* NSCharacterSet_Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = EE7A686A1268D477003AC568 /* NSCharacterSet_Extensions.m */; };
+		EE7A687F1268D477003AC568 /* NSDictionary_JSONExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = EE7A686C1268D477003AC568 /* NSDictionary_JSONExtensions.m */; };
+		EE7A68801268D477003AC568 /* NSScanner_Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = EE7A686E1268D477003AC568 /* NSScanner_Extensions.m */; };
+		EE7A68811268D477003AC568 /* CJSONDeserializer.m in Sources */ = {isa = PBXBuildFile; fileRef = EE7A68711268D477003AC568 /* CJSONDeserializer.m */; };
+		EE7A68821268D477003AC568 /* CJSONScanner.m in Sources */ = {isa = PBXBuildFile; fileRef = EE7A68731268D477003AC568 /* CJSONScanner.m */; };
+		EE7A68831268D477003AC568 /* CJSONSerializer.m in Sources */ = {isa = PBXBuildFile; fileRef = EE7A68751268D477003AC568 /* CJSONSerializer.m */; };
+		EE7A68841268D477003AC568 /* TCPServer.m in Sources */ = {isa = PBXBuildFile; fileRef = EE7A68771268D477003AC568 /* TCPServer.m */; };
+		EE7A68851268D477003AC568 /* HTTPServer.m in Sources */ = {isa = PBXBuildFile; fileRef = EE7A68791268D477003AC568 /* HTTPServer.m */; };
+		EE7A68861268D477003AC568 /* SimpleHTTPServer.m in Sources */ = {isa = PBXBuildFile; fileRef = EE7A687B1268D477003AC568 /* SimpleHTTPServer.m */; };
 		EED2A5A3125E3B1C000F4579 /* AMSerialPort_Deprecated.m in Sources */ = {isa = PBXBuildFile; fileRef = EED2A593125E3B1C000F4579 /* AMSerialPort_Deprecated.m */; };
 		EED2A5A4125E3B1C000F4579 /* AMSerialPort.m in Sources */ = {isa = PBXBuildFile; fileRef = EED2A595125E3B1C000F4579 /* AMSerialPort.m */; };
 		EED2A5A5125E3B1C000F4579 /* AMSerialPortAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EED2A597125E3B1C000F4579 /* AMSerialPortAdditions.m */; };
@@ -43,6 +55,29 @@
 		EE749431125CC1A000775357 /* projektors.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = projektors.icns; sourceTree = "<group>"; };
 		EE749470125CE1F600775357 /* 16_proj.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 16_proj.png; sourceTree = "<group>"; };
 		EE7494FC125CE6F500775357 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		EE7A68401268D3EE003AC568 /* web.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = web.html; path = /Users/gazz/Dropbox/Wave/RS232/web.html; sourceTree = "<absolute>"; };
+		EE7A68641268D477003AC568 /* CDataScanner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDataScanner.h; sourceTree = "<group>"; };
+		EE7A68651268D477003AC568 /* CDataScanner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDataScanner.m; sourceTree = "<group>"; };
+		EE7A68671268D477003AC568 /* CDataScanner_Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDataScanner_Extensions.h; sourceTree = "<group>"; };
+		EE7A68681268D477003AC568 /* CDataScanner_Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDataScanner_Extensions.m; sourceTree = "<group>"; };
+		EE7A68691268D477003AC568 /* NSCharacterSet_Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSCharacterSet_Extensions.h; sourceTree = "<group>"; };
+		EE7A686A1268D477003AC568 /* NSCharacterSet_Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSCharacterSet_Extensions.m; sourceTree = "<group>"; };
+		EE7A686B1268D477003AC568 /* NSDictionary_JSONExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSDictionary_JSONExtensions.h; sourceTree = "<group>"; };
+		EE7A686C1268D477003AC568 /* NSDictionary_JSONExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSDictionary_JSONExtensions.m; sourceTree = "<group>"; };
+		EE7A686D1268D477003AC568 /* NSScanner_Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSScanner_Extensions.h; sourceTree = "<group>"; };
+		EE7A686E1268D477003AC568 /* NSScanner_Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSScanner_Extensions.m; sourceTree = "<group>"; };
+		EE7A68701268D477003AC568 /* CJSONDeserializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CJSONDeserializer.h; sourceTree = "<group>"; };
+		EE7A68711268D477003AC568 /* CJSONDeserializer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CJSONDeserializer.m; sourceTree = "<group>"; };
+		EE7A68721268D477003AC568 /* CJSONScanner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CJSONScanner.h; sourceTree = "<group>"; };
+		EE7A68731268D477003AC568 /* CJSONScanner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CJSONScanner.m; sourceTree = "<group>"; };
+		EE7A68741268D477003AC568 /* CJSONSerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CJSONSerializer.h; sourceTree = "<group>"; };
+		EE7A68751268D477003AC568 /* CJSONSerializer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CJSONSerializer.m; sourceTree = "<group>"; };
+		EE7A68761268D477003AC568 /* TCPServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCPServer.h; sourceTree = "<group>"; };
+		EE7A68771268D477003AC568 /* TCPServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCPServer.m; sourceTree = "<group>"; };
+		EE7A68781268D477003AC568 /* HTTPServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HTTPServer.h; sourceTree = "<group>"; };
+		EE7A68791268D477003AC568 /* HTTPServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HTTPServer.m; sourceTree = "<group>"; };
+		EE7A687A1268D477003AC568 /* SimpleHTTPServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleHTTPServer.h; sourceTree = "<group>"; };
+		EE7A687B1268D477003AC568 /* SimpleHTTPServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimpleHTTPServer.m; sourceTree = "<group>"; };
 		EED2A591125E3B1C000F4579 /* AMSerialErrors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMSerialErrors.h; sourceTree = "<group>"; };
 		EED2A592125E3B1C000F4579 /* AMSerialPort_Deprecated.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMSerialPort_Deprecated.h; sourceTree = "<group>"; };
 		EED2A593125E3B1C000F4579 /* AMSerialPort_Deprecated.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMSerialPort_Deprecated.m; sourceTree = "<group>"; };
@@ -81,6 +116,7 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				EE7A684D1268D45B003AC568 /* HTTPServer */,
 				EED2A58F125E3B1C000F4579 /* Protocol */,
 				256AC3D80F4B6AC300CF3369 /* InFocusControllerAppDelegate.h */,
 				256AC3D90F4B6AC300CF3369 /* InFocusControllerAppDelegate.m */,
@@ -139,6 +175,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				EE7A68401268D3EE003AC568 /* web.html */,
 				EED2A64F125E443B000F4579 /* 32_proj_gray.png */,
 				EED2A631125E428A000F4579 /* 32_proj.png */,
 				EE749470125CE1F600775357 /* 16_proj.png */,
@@ -159,14 +196,67 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		EE7A684D1268D45B003AC568 /* HTTPServer */ = {
+			isa = PBXGroup;
+			children = (
+				EE7A68631268D477003AC568 /* TouchJSON */,
+				EE7A68761268D477003AC568 /* TCPServer.h */,
+				EE7A68771268D477003AC568 /* TCPServer.m */,
+				EE7A68781268D477003AC568 /* HTTPServer.h */,
+				EE7A68791268D477003AC568 /* HTTPServer.m */,
+				EE7A687A1268D477003AC568 /* SimpleHTTPServer.h */,
+				EE7A687B1268D477003AC568 /* SimpleHTTPServer.m */,
+			);
+			name = HTTPServer;
+			sourceTree = "<group>";
+		};
+		EE7A68631268D477003AC568 /* TouchJSON */ = {
+			isa = PBXGroup;
+			children = (
+				EE7A68641268D477003AC568 /* CDataScanner.h */,
+				EE7A68651268D477003AC568 /* CDataScanner.m */,
+				EE7A68661268D477003AC568 /* Extensions */,
+				EE7A686F1268D477003AC568 /* JSON */,
+			);
+			path = TouchJSON;
+			sourceTree = "<group>";
+		};
+		EE7A68661268D477003AC568 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				EE7A68671268D477003AC568 /* CDataScanner_Extensions.h */,
+				EE7A68681268D477003AC568 /* CDataScanner_Extensions.m */,
+				EE7A68691268D477003AC568 /* NSCharacterSet_Extensions.h */,
+				EE7A686A1268D477003AC568 /* NSCharacterSet_Extensions.m */,
+				EE7A686B1268D477003AC568 /* NSDictionary_JSONExtensions.h */,
+				EE7A686C1268D477003AC568 /* NSDictionary_JSONExtensions.m */,
+				EE7A686D1268D477003AC568 /* NSScanner_Extensions.h */,
+				EE7A686E1268D477003AC568 /* NSScanner_Extensions.m */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		EE7A686F1268D477003AC568 /* JSON */ = {
+			isa = PBXGroup;
+			children = (
+				EE7A68701268D477003AC568 /* CJSONDeserializer.h */,
+				EE7A68711268D477003AC568 /* CJSONDeserializer.m */,
+				EE7A68721268D477003AC568 /* CJSONScanner.h */,
+				EE7A68731268D477003AC568 /* CJSONScanner.m */,
+				EE7A68741268D477003AC568 /* CJSONSerializer.h */,
+				EE7A68751268D477003AC568 /* CJSONSerializer.m */,
+			);
+			path = JSON;
+			sourceTree = "<group>";
+		};
 		EED2A58F125E3B1C000F4579 /* Protocol */ = {
 			isa = PBXGroup;
 			children = (
+				EED2A590125E3B1C000F4579 /* AMSerialPort */,
 				EED2A59F125E3B1C000F4579 /* ProjectorProtocol.h */,
 				EED2A5A0125E3B1C000F4579 /* ProjectorProtocol.m */,
 				EED2A5A1125E3B1C000F4579 /* NSStringExtensions.h */,
 				EED2A5A2125E3B1C000F4579 /* NSStringExtensions.m */,
-				EED2A590125E3B1C000F4579 /* AMSerialPort */,
 			);
 			name = Protocol;
 			sourceTree = "<group>";
@@ -241,6 +331,7 @@
 				EE749471125CE1F600775357 /* 16_proj.png in Resources */,
 				EED2A632125E428A000F4579 /* 32_proj.png in Resources */,
 				EED2A650125E443B000F4579 /* 32_proj_gray.png in Resources */,
+				EE7A68411268D3EE003AC568 /* web.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -261,6 +352,17 @@
 				EED2A5A8125E3B1C000F4579 /* AMStandardEnumerator.m in Sources */,
 				EED2A5A9125E3B1C000F4579 /* ProjectorProtocol.m in Sources */,
 				EED2A5AA125E3B1C000F4579 /* NSStringExtensions.m in Sources */,
+				EE7A687C1268D477003AC568 /* CDataScanner.m in Sources */,
+				EE7A687D1268D477003AC568 /* CDataScanner_Extensions.m in Sources */,
+				EE7A687E1268D477003AC568 /* NSCharacterSet_Extensions.m in Sources */,
+				EE7A687F1268D477003AC568 /* NSDictionary_JSONExtensions.m in Sources */,
+				EE7A68801268D477003AC568 /* NSScanner_Extensions.m in Sources */,
+				EE7A68811268D477003AC568 /* CJSONDeserializer.m in Sources */,
+				EE7A68821268D477003AC568 /* CJSONScanner.m in Sources */,
+				EE7A68831268D477003AC568 /* CJSONSerializer.m in Sources */,
+				EE7A68841268D477003AC568 /* TCPServer.m in Sources */,
+				EE7A68851268D477003AC568 /* HTTPServer.m in Sources */,
+				EE7A68861268D477003AC568 /* SimpleHTTPServer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

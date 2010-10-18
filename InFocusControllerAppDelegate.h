@@ -9,8 +9,10 @@
 #import <Cocoa/Cocoa.h>
 
 #import "ProjectorProtocol.h"
+#import "SimpleHTTPServer.h"
 
-@interface InFocusControllerAppDelegate : NSObject <NSApplicationDelegate> {
+
+@interface InFocusControllerAppDelegate : NSObject <NSApplicationDelegate, RequestHandler> {
     NSWindow *window;
 	IBOutlet NSMenu *statusMenu;
 	NSStatusItem *statusItem;
@@ -22,6 +24,9 @@
 	ProjectorProtocol *protocol;
 	NSLock *connectLock;
 	NSTimer *timer;
+	
+	// remote access
+	SimpleHTTPServer *httpServer;
 }
 
 @property (retain) ProjectorProtocol *protocol;
@@ -32,6 +37,7 @@
 @property (retain) NSMenu *sources;
 @property (retain) NSMenu *displayModes;
 @property (retain) NSTimer *timer;
+@property (retain) SimpleHTTPServer *httpServer;
 
 -(void) connectToProjector;
 -(void) updateStatus;

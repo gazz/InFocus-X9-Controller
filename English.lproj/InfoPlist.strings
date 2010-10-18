@@ -1,2 +1,13 @@
 /* Localized versions of Info.plist keys */
-
+SourceComputer="Computer";
+SourceComponent=Component;
+SourceSVideo=S-Video;
+SourceComposite=Composite;
+SourceDVI=DVI;
+SourceSCART=SCART;
+SourceHDMI=HDMI;
+DisplayPC=PC;
+DisplayMovie=Movie;
+DisplaySRGB=sRGB;
+DisplayGame=Game;
+DisplayUser=User;

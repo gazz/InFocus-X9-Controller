@@ -64,6 +64,8 @@ typedef enum {
 -(BOOL) setBrightness:(UInt32)value;
 -(BOOL) setContrast:(UInt32)value;
 
-
+// raw access messages
+-(UInt32) sendReadValueMessage:(NSString*)message;
+-(BOOL) sendInputMessage:(NSString*)message withValue:(UInt32)value;
 
 @end

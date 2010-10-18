@@ -14,8 +14,6 @@
 @interface ProjectorProtocol (PrivateMethods)
 -(void) serialPortReadData:(NSDictionary *)dataDictionary;
 -(UInt32) parseIntResponse:(NSString*)message;
--(UInt32) sendReadValueMessage:(NSString*)message;
--(BOOL) sendInputMessage:(NSString*)message withValue:(UInt32)value;
 @end
 
 @implementation ProjectorProtocol
@@ -206,11 +204,15 @@
 #pragma mark X9 Projector interface
 
 -(BOOL)isProjectorConnected {
-	return [self sendReadValueMessage:@"PWR?"];
+	NSArray *messages = [self sendRequest:@"PWR?"];
+	NSString *msg = [messages lastObject];
+	if ([msg isEqualToString:REQUEST_PASSED] || [msg isEqualToString:REQUEST_FAILED])
+		return YES;
+	return NO;
 }
 
 -(BOOL)isProjectorOn {
-	if ([self sendReadValueMessage:@"SRC?"])
+	if ([self sendReadValueMessage:@"SRC?"]!=-1)
 		return YES;
 	if ([self isSourceLocked])
 		return YES;

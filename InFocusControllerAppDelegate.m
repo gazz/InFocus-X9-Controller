@@ -8,10 +8,21 @@
 
 #import "InFocusControllerAppDelegate.h"
 #import "AMSerialPortList.h"
+#import "SimpleHTTPServer.h"
+
+#import "CJSONSerializer.h"
+#import "NSStringExtensions.h"
+
+
+@interface InFocusControllerAppDelegate (PrivateMethods)
+-(NSString*) buildHTMLResponse;
+@end
+
+
 
 @implementation InFocusControllerAppDelegate
 
-@synthesize window, protocol, connectLock, powerItem, quitItem, timer, sourceLock, sources, displayModes;
+@synthesize window, protocol, connectLock, powerItem, quitItem, timer, sourceLock, sources, displayModes, httpServer;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
 	self.connectLock = [[NSLock alloc] init];
@@ -21,6 +32,11 @@
 	[self performSelectorInBackground:@selector(connectToProjector) withObject:nil];
 	
 	self.timer = [NSTimer scheduledTimerWithTimeInterval:3 target:self selector:@selector(updateStatus) userInfo:nil repeats:YES];
+	
+	// start up webserver
+	self.httpServer = [SimpleHTTPServer serverWithPort:64299 andServiceName:@"InFocusX9 Projector remote"];
+	[httpServer setDelegate:self];
+	[httpServer start];
 }
 
 -(void) awakeFromNib {
@@ -38,6 +54,7 @@
 }
 
 -(void) dealloc {
+	[httpServer release];
 	[timer release];
 	[powerItem release];
 	[quitItem release];
@@ -211,6 +228,156 @@
 	}
 }
 
+#pragma mark -
+#pragma mark HTTP Server request handler
 
+//-(NSString*) respondToURI:(NSString*)uri {
+-(NSString*) respondToURI:(NSString*)uri ofType:(NSString*)type {
+	// URL example: http://hostname:64299/PWR/1, http://hostname:64299/DSP!
+	// pattern: http://<host>:<port>/<action>/<value>
+	
+	BOOL uriRecognized = NO;
+	
+	// split url
+	NSMutableArray *reqMsgArr = [NSMutableArray array];
+	// check if starts with / and remove it
+	if ([uri startsWith:@"/"]) {
+		uri = [uri substringFromIndex:1];
+	}
+	NSRange rng = [uri rangeOfString:@"/"];
+	if (rng.location!=NSNotFound) {
+		[reqMsgArr addObject:[uri substringWithRange:NSMakeRange(0, rng.location)]];
+		if (uri.length > rng.location+1) {
+			[reqMsgArr addObject:[uri substringFromIndex:(rng.location+1)]];
+		}
+	} else {
+		[reqMsgArr addObject:uri];
+	}
+	
+	NSArray *knownMessages = [NSArray arrayWithObjects:@"PWR",@"SRC",@"DSP",@"SRL",@"BRI",@"CON",@"KEY",nil];
+	
+	if (reqMsgArr.count > 0) {
+		NSString *msg = [reqMsgArr objectAtIndex:0];
+		if (msg.length>=3) {
+			msg = [msg substringToIndex:3];
+		}
+		for (UInt32 i=0; i< knownMessages.count; ++i) {
+			if ([[knownMessages objectAtIndex:i] isEqualToString:msg]) {
+				uriRecognized = YES;
+				break;
+			}
+		}
+	}
+	
+	NSDictionary *resultDict = nil;
+	if (uriRecognized) {
+		NSString *msg = [reqMsgArr objectAtIndex:0];
+		if (reqMsgArr.count > 1) {
+			// send data message
+			UInt32 value = [[reqMsgArr objectAtIndex:1] intValue];
+			BOOL result = [protocol sendInputMessage:msg withValue:value];
+			resultDict = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:result] forKey:@"result"];
+		} else {
+			msg = [msg stringByReplacingOccurrencesOfString:@"Q" withString:@"?"];
+			// request data message
+			UInt32 result = [protocol sendReadValueMessage:msg];
+			resultDict = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:result] forKey:@"result"];
+		}
+	} else {
+		NSMutableDictionary *tmpDict = [NSMutableDictionary dictionary];
+		// query full status
+		[tmpDict setObject:[NSNumber numberWithBool:[protocol isProjectorOn]] forKey:@"PWR"];
+		[tmpDict setObject:[NSNumber numberWithInt:[protocol source]] forKey:@"SRC"];
+		[tmpDict setObject:[NSNumber numberWithInt:[protocol displayMode]] forKey:@"DSP"];
+		[tmpDict setObject:[NSNumber numberWithBool:[protocol isSourceLocked]] forKey:@"SRL"];
+		[tmpDict setObject:[NSNumber numberWithInt:[protocol sendReadValueMessage:@"BRI?"]] forKey:@"BRI"];
+		[tmpDict setObject:[NSNumber numberWithInt:[protocol sendReadValueMessage:@"CON?"]] forKey:@"CON"];
+		resultDict = tmpDict;
+	}
+	
+	// return the same simple html page for every request
+	if ([type isEqualToString:@"HTML"]) {
+		return [self buildHTMLResponse];
+	} else if ([type isEqualToString:@"JSON"]) {
+		CJSONSerializer *serializer = [CJSONSerializer serializer];
+		return [serializer serializeDictionary:resultDict];
+	} else if ([type isEqualToString:@"XML"]) {
+		// TODO: respond with XML
+	}
+	return @"";
+}
+
+-(NSString*) comboBoxWithItems:(NSArray*)items andIntValue:(UInt32)selectedValue message:(NSString*)message {
+	NSString *selectHTML = [NSString stringWithFormat:@"<select id='%@' onchange='submitComboMessage(\"%@\")'>", [NSString stringWithFormat:@"%@_combo", message],  message];
+	for (UInt32 i=0; i< items.count; ++i) {
+		NSString *item = [items objectAtIndex:i];
+		NSString *itemOption = [NSString stringWithFormat:@"<option value='%d' %@ >%@</option>", i, (i==selectedValue?@"selected":@""), item];
+		selectHTML = [selectHTML stringByAppendingString:itemOption];
+	}
+	selectHTML = [selectHTML stringByAppendingString:@"</select>"];
+	return selectHTML;
+}
+
+-(NSString*) buildHTMLResponse {
+	NSURL *url = [[NSBundle mainBundle] URLForResource:@"web" withExtension:@"html"];
+	NSString *response = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:nil];
+
+	
+// read localized strings (great way to learn stuff on your hobby project, this case - localization on OSX & iOS)
+	NSArray *sourceNames = [NSArray arrayWithObjects:NSLocalizedStringFromTable(@"SourceComputer",@"InfoPlist",@""), 
+							NSLocalizedStringFromTable(@"SourceComponent",@"InfoPlist",nil), 
+							NSLocalizedStringFromTable(@"SourceS-Video",@"InfoPlist",nil), 
+							NSLocalizedStringFromTable(@"SourceComposite",@"InfoPlist",nil), 
+							NSLocalizedStringFromTable(@"SourceDVI",@"InfoPlist",nil), 
+							NSLocalizedStringFromTable(@"SourceSCART",@"InfoPlist",nil), 
+							NSLocalizedStringFromTable(@"SourceHDMI",@"InfoPlist",nil), 
+							nil]; 
+	
+//	NSLog(@"Sources: '%@'", sourceNames);
+	
+	NSArray *displayModesArr = [NSArray arrayWithObjects:NSLocalizedStringFromTable(@"DisplayPC",@"InfoPlist",@""), 
+							NSLocalizedStringFromTable(@"DisplayMovie",@"InfoPlist",nil), 
+							NSLocalizedStringFromTable(@"DisplaySRGB",@"InfoPlist",nil), 
+							NSLocalizedStringFromTable(@"DisplayGame",@"InfoPlist",nil), 
+							NSLocalizedStringFromTable(@"DisplayUser",@"InfoPlist",nil), 
+							nil]; 
+	
+//	NSLog(@"Display Modes: '%@'", displayModesArr);
+	
+// query projector for status
+	BOOL projectorOn = [protocol isProjectorOn];
+	UInt32 sourceIndex = [protocol source];
+	UInt32 displayModeIndex = [protocol displayMode];
+	BOOL sourceLocked = [protocol isSourceLocked];
+	
+	
+	
+// replace html template placeholders with real values
+	NSMutableDictionary *replacables = [NSMutableDictionary dictionary];
+	[replacables setObject:(projectorOn?@"On":@"Off") forKey:@"${POWER_STATE_NAME}"];
+	[replacables setObject:(sourceIndex==-1?@"N/A":[sourceNames objectAtIndex:sourceIndex]) forKey:@"${SOURCE}"];
+	[replacables setObject:(sourceLocked?@"Yes":@"No") forKey:@"${SOURCE_LOCKED}"];
+	[replacables setObject:(displayModeIndex==-1?@"N/A":[displayModesArr objectAtIndex:displayModeIndex]) forKey:@"${DISPLAY_MODE}"];
+	
+	// Power On/Off
+	[replacables setObject:(!projectorOn?@"On":@"Off") forKey:@"${POWER_STATE_TOGGLE_NAME}"];		// name
+	[replacables setObject:(!projectorOn?@"1":@"0") forKey:@"${POWER_STATE}"];					// value
+		
+	// SELECT_SOURCE_COMBO
+	[replacables setObject:[self comboBoxWithItems:sourceNames andIntValue:sourceIndex message:@"SRC"] forKey:@"${SELECT_SOURCE_COMBO}"];
+	
+	// SELECT_DISPLAY_MODE_COMBO
+	[replacables setObject:[self comboBoxWithItems:displayModesArr andIntValue:displayModeIndex message:@"DSP"] forKey:@"${SELECT_DISPLAY_MODE_COMBO}"];
+	
+	// replace every occurence in web template with current value
+	NSArray *keyArray =  [replacables allKeys];
+	for (int i=0; i < [keyArray count]; ++i) {
+		NSString *key = [keyArray objectAtIndex:i];
+		NSString *value = [replacables objectForKey:key];
+		response = [response stringByReplacingOccurrencesOfString:key withString:value];
+	}
+	
+	return response;
+}
 
 @end
